@@ -144,11 +144,26 @@
                         FROM ROLES AS r
                         INNER JOIN USERS AS u
                         on r.rol_code = u.rol_code
-                        WHERE user_email = :userEmail AND user_pass = :userPass';
+                        WHERE user_email = :userEmail';
                 $stmt = $this->dbh->prepare($sql);
                 $stmt->bindValue('userEmail', $this->getUserEmail());
 $stmt->execute();
 $userDb = $stmt->fetch();
+if ($userDb && password_verify($this->getUserPass(), $userDb['user_pass'])) {
+    return new User(
+        $userDb['rol_code'],
+        $userDb['rol_name'],
+        $userDb['user_code'],
+        $userDb['user_name'],
+        $userDb['user_lastname'],
+        $userDb['user_id'],
+        $userDb['user_email'],
+        $userDb['user_pass'],
+        $userDb['user_state']
+    );
+}
+return false;
+
 
 if ($userDb && password_verify($this->getUserPass(), $userDb['user_pass'])) {
     return new User(
@@ -287,7 +302,9 @@ return false;
                 $stmt->bindValue('userLastName', $this->getUserLastName());
                 $stmt->bindValue('userId', $this->getUserId());
                 $stmt->bindValue('userEmail', $this->getUserEmail());
-                $stmt->bindValue('userPass', sha1($this->getUserPass()));
+                $hash = password_hash($this->getUserPass(), PASSWORD_BCRYPT);
+$stmt->bindValue('userPass', $hash);
+
                 $stmt->bindValue('userState', $this->getUserState());
                 $stmt->execute();
             } catch (Exception $e) {
@@ -391,7 +408,9 @@ return false;
                 $stmt->bindValue('userLastName', $this->getUserLastName());
                 $stmt->bindValue('userId', $this->getUserId());
                 $stmt->bindValue('userEmail', $this->getUserEmail());
-                $stmt->bindValue('userPass', sha1($this->getUserPass()));
+           $hash = password_hash($this->getUserPass(), PASSWORD_BCRYPT);
+$stmt->bindValue('userPass', $hash);
+
                 $stmt->bindValue('userState', $this->getUserState());
                 $stmt->execute();
             } catch (Exception $e) {
