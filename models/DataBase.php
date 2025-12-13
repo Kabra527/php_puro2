@@ -1,16 +1,28 @@
 <?php
-    class DataBase{
-        #  Conexión Local
-         public static function connection(){
-            $hostname = "localhost";
-            $port = "3306";
-            $database = "database_php";
-            $username = "root";
-            $password = "";
-		 	$pdo = new PDO("mysql:host=$hostname;port=$port;dbname=$database;charset=utf8",$username,$password);
-		 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		 	return $pdo;
-		 }
+class DataBase {
+
+    public static function connection() {
+        try {
+            $hostname = getenv('DB_HOST') ?: 'localhost';
+            $port     = getenv('DB_PORT') ?: '3306';
+            $database = getenv('DB_NAME') ?: 'database_php';
+            $username = getenv('DB_USER');
+            $password = getenv('DB_PASS');
+
+            $dsn = "mysql:host=$hostname;port=$port;dbname=$database;charset=utf8";
+
+            $pdo = new PDO($dsn, $username, $password, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+
+            return $pdo;
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            throw new RuntimeException('Error de conexión a la base de datos');
+        }
+    }
+}
         
         ## Conexión Azure
         // public static function connection(){

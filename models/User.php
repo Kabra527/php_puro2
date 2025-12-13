@@ -147,7 +147,26 @@
                         WHERE user_email = :userEmail AND user_pass = :userPass';
                 $stmt = $this->dbh->prepare($sql);
                 $stmt->bindValue('userEmail', $this->getUserEmail());
-                $stmt->bindValue('userPass', sha1($this->getUserPass()));
+$stmt->execute();
+$userDb = $stmt->fetch();
+
+if ($userDb && password_verify($this->getUserPass(), $userDb['user_pass'])) {
+    return new User(
+        $userDb['rol_code'],
+        $userDb['rol_name'],
+        $userDb['user_code'],
+        $userDb['user_name'],
+        $userDb['user_lastname'],
+        $userDb['user_id'],
+        $userDb['user_email'],
+        $userDb['user_pass'],
+        $userDb['user_state']
+    );
+}
+return false;
+
+                $hashedPassword = password_hash($this->getUserPass(), PASSWORD_BCRYPT);
+                $stmt->bindValue('userPass', $hashedPassword);
                 $stmt->execute();
                 $userDb = $stmt->fetch();
                 if ($userDb) {
@@ -167,9 +186,10 @@
                     return false;
                 }
             } catch (Exception $e) {
-                die($e->getMessage());
-            }
-        }
+    error_log($e->getMessage());
+    return false;
+}
+
 
         # RF03_CU03 - Registrar Rol
         public function create_rol(){
@@ -203,7 +223,7 @@
         }
 
         # RF05_CU05 - Obtener el Rol por el código
-        public function getrol_bycode($rolCode){
+        public function getRolBycode($rolCode){
             try {
                 $sql = "SELECT * FROM ROLES WHERE rol_code=:rolCode";
                 $stmt = $this->dbh->prepare($sql);
