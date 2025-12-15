@@ -1,10 +1,27 @@
 <?php
-    require_once "models/User.php";
-    class Users{
-        private $session;
-        public function __construct(){
-            $this->session = $_SESSION['session'];
-        }
+
+namespace Controllers;
+
+use Models\User;
+
+define('REDIRECT_DASHBOARD', 'Location: ?c=Dashboard');
+define('REDIRECT_ROL_READ', 'Location: ?c=Users&a=rolRead');
+define('REDIRECT_USER_READ', 'Location: ?c=Users&a=userRead');
+
+class Users
+{
+    private $session;
+
+    public function __construct()
+    {
+        $this->session = $_SESSION['session'];
+    }
+
+    public function main()
+    {
+        header(REDIRECT_DASHBOARD);
+        exit;
+    }
 
         // Controlador Principal
         public function main(){
@@ -101,7 +118,6 @@
         // Controlador Consultar Usuarios
         public function userRead(){
             if ($this->session == 'admin' || $this->session == 'seller') {
-                $state = ['Inactivo', 'Activo'];
                 $users = new User;
                 $users = $users->read_users();
                 require_once "views/modules/users/user_read.view.php";
@@ -114,7 +130,6 @@
         public function userUpdate(){
             if ($this->session == 'admin' || $this->session == 'seller') {
                 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-                    $state = ['Inactivo', 'Activo'];
                     $roles = new User;
                     $roles = $roles->read_roles();
                     $user = new User;
