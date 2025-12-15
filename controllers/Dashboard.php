@@ -1,9 +1,9 @@
 <?php
-class Dashboard{
-
-    public function main(){
+class Dashboard
+{
+    public function main()
+    {
         $session = $_SESSION['session'];
-        require_once "views/roles/".$session."/". $session.".view.php";
+        require_once "views/roles/" . $session . "/" . $session . ".view.php";
     }
 }
-?>
